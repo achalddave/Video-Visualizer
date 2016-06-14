@@ -23,7 +23,7 @@ function normalizeGroundtruth(receivedGroundtruth) {
   /* Sort groundtruth by start and end times, and create annotation objects
    * from annotation arrays.
    *
-   * @param {Array} receivedGroundtruth: An array of arrays of the form
+   * @param {Array} receivedGroundtruth An array of arrays of the form
    *     (startSec, endSec, label)
    *
    * @return {Array} Array of objects containing fields .start, .end, .label,
@@ -59,10 +59,8 @@ function loadVideo(video) {
   activeLabels = {};
 
   $('video').attr('src', 'video/' + video);
-  var groundtruthRequest = $.get('/groundtruth/' + video);
-  var predictionsRequest = $.get('/predictions/' + video);
 
-  $.when(groundtruthRequest, predictionsRequest).then(
+  $.when($.get('/groundtruth/' + video), $.get('/predictions/' + video)).then(
     function(groundtruthResponse, predictionsResponse) {
       var receivedGroundtruth = groundtruthResponse[0];
       var receivedPredictions = predictionsResponse[0];
@@ -90,7 +88,6 @@ function loadVideo(video) {
       ];
 
       var layout = {title: 'Predictions'};
-
       Plotly.newPlot('groundtruth-graphs', data, layout, {linkText: 'hi'});
     },
     function() {  // Failed request
