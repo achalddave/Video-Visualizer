@@ -1,0 +1,3 @@
+[submodule "data_loaders/thumos_util"]
+	path = data_loaders/thumos_util
+	url = git@github.com:achalddave/thumos-util.git
