@@ -19,6 +19,39 @@ function deactivateLabel(label) {
   $('#label-' + label).removeClass('active-label');
 }
 
+function normalizeGroundtruth(receivedGroundtruth) {
+  /* Sort groundtruth by start and end times, and create annotation objects
+   * from annotation arrays.
+   *
+   * @param {Array} receivedGroundtruth: An array of arrays of the form
+   *     (startSec, endSec, label)
+   *
+   * @return {Array} Array of objects containing fields .start, .end, .label,
+   *     sorted by start time and then by end time.
+   */
+  var groundtruth = [];
+  receivedGroundtruth.forEach(function(x) {
+    groundtruth.push({'start': x[0], 'end': x[1], 'label': x[2]});
+  });
+  // Sort by start seconds, and then by end seconds.
+  groundtruth.sort(function(a, b) {
+    var startDiff = a.start - b.start;
+    if (startDiff != 0) {
+      return startDiff;
+    } else {
+      return a.end - b.end
+    }
+  });
+  return groundtruth;
+}
+
+function getUniqueLabels(groundtruth) {
+  var labels = {};
+  groundtruth.forEach(function(x) { labels[x.label] = 1; });
+  labels = Object.keys(labels);
+  return labels;
+}
+
 function loadVideo(video) {
   allGroundtruth = null;
   allPredictions = null;
@@ -26,32 +59,45 @@ function loadVideo(video) {
   activeLabels = {};
 
   $('video').attr('src', 'video/' + video);
-  $.get('/groundtruth/' + video, function(receivedGroundtruth) {
-     // receivedGroundtruth is an array of arrays of the form
-     // (startSec, endSec, label)
-     allGroundtruth = [];
-     receivedGroundtruth.forEach(function(x) {
-       allGroundtruth.push({'start': x[0], 'end': x[1], 'label': x[2]});
-     });
-     // Sort by start seconds, and then by end seconds.
-     allGroundtruth.sort(function(a, b) {
-       var startDiff = a.start - b.start;
-       if (startDiff != 0) {
-         return startDiff;
-       } else {
-         return a.end - b.end
-       }
-     });
+  var groundtruthRequest = $.get('/groundtruth/' + video);
+  var predictionsRequest = $.get('/predictions/' + video);
 
-     var labels = {};
-     allGroundtruth.forEach(function(x) { labels[x.label] = 1; });
-     labels = Object.keys(labels);
-     labels.sort();
-     labels.forEach(function(label) { addLabel(label); });
-   });
+  $.when(groundtruthRequest, predictionsRequest).then(
+    function(groundtruthResponse, predictionsResponse) {
+      var receivedGroundtruth = groundtruthResponse[0];
+      var receivedPredictions = predictionsResponse[0];
+
+      allGroundtruth = normalizeGroundtruth(receivedGroundtruth);
+      var labels = getUniqueLabels(allGroundtruth);
+      labels.sort();
+      labels.forEach(function(label) { addLabel(label); });
+
+      var heatmapValues = []
+      var text = [];
+      for (var label in receivedPredictions) {
+        heatmapValues.push(receivedPredictions[label]);
+        var labelText = [];
+        receivedPredictions[label].forEach(function(score, frame) {
+          labelText.push(
+              'Frame: ' + frame + '\n' +
+              'Score: ' + score + '\n' +
+              'Label: ' + label);
+        });
+        text.push(labelText);
+      }
+      var data = [
+        {z: heatmapValues, text: text, type: 'heatmap', colorscale: 'Greys'}
+      ];
+
+      var layout = {title: 'Predictions'};
+
+      Plotly.newPlot('groundtruth-graphs', data, layout, {linkText: 'hi'});
+    },
+    function() {  // Failed request
+      $('#debug').text('Request for predictions or groundtruth failed.');
+    });
 
   $('video').bind('timeupdate', function() {
-    $('#debug').text('');
     if (allGroundtruth == null) {
       return;
     }
@@ -69,12 +115,9 @@ function loadVideo(video) {
       }
       console.log('Activating', currentGroundtruth);
       activateLabel(currentGroundtruth.label);
-      $('#debug').text($('#debug').text() +
-                       '(' + currentGroundtruth.start + ', ' +
-                         + currentGroundtruth.end + ', '
-                         + currentGroundtruth.label + '); ');
     }
   });
+
 }
 
 $(function() {
