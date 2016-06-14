@@ -97,7 +97,8 @@ function loadVideo(video) {
       $('#debug').text('Request for predictions or groundtruth failed.');
     });
 
-  $('video').bind('timeupdate', function() {
+  $('video').off('timeupdate');
+  $('video').on('timeupdate', function() {
     if (allGroundtruth == null) {
       return;
     }
