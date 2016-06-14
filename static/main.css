@@ -1,13 +1,33 @@
 body { }
 
+#video-realtime-labels {
+  margin: 0 auto;
+  text-align: center;
+}
+
+video {
+  vertical-align: middle;
+  width: 500px;
+}
+
+#realtime-labels {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 #groundtruth {
-  vertical-align: top;
   display: inline-block;
   width: 200px;
 }
 
+#predictions {
+  display: inline-block;
+  width: 80px;
+  text-align: center;
+}
+
 .label {
-  color: #aaa;
+  color: #000;
   padding: 0px 5px;
   margin: 5px;
 }
@@ -16,4 +36,3 @@ body { }
   color: white;
   background: black;
 }
-

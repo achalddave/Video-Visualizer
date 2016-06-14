@@ -36,6 +36,14 @@ class MultiThumosDataLoader(object):
     def get_videos_dir(self):
         return self.videos_dir
 
+    def video_list(self):
+        """
+        Returns:
+            videos (list): List of videos to serve.
+        """
+        with h5py.File(self.predictions_hdf5) as predictions_f:
+            return predictions_f.keys()
+
     def video_groundtruth(self, video_name):
         """
         Returns:
