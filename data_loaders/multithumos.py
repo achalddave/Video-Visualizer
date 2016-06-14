@@ -1,10 +1,14 @@
 import collections
-import json
+import math
 from os import path
 
 import h5py
 
 from thumos_util import annotation, parsing
+
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
 
 
 class MultiThumosDataLoader(object):
@@ -52,7 +56,8 @@ class MultiThumosDataLoader(object):
         with h5py.File(self.predictions_hdf5) as predictions_f:
             predictions_matrix = predictions_f[video_name]
             predictions = {
-                self.class_mapping[i]: predictions_matrix[:, i]
+                self.class_mapping[i]: [float(sigmoid(x))
+                                        for x in predictions_matrix[:, i]]
                 for i in range(predictions_matrix.shape[1])
             }
         return predictions
