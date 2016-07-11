@@ -162,7 +162,6 @@ function loadVideo(video) {
 
     // Update prediction scores for current frame.
     var frame = Math.round(time * numFrames / videoLength);
-    console.log(time, videoLength, frame);
     var scores = {}
     groundtruthLabels.forEach(function(label) {
       scores[label] = allPredictions[label][frame];
