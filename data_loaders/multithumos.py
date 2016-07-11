@@ -30,7 +30,6 @@ class MultiThumosDataLoader(object):
 
         self.class_mapping = parsing.load_class_mapping(class_list).values()
 
-        # TODO(achald): Support predictions.
         self.predictions_hdf5 = predictions_hdf5
 
     def get_videos_dir(self):
