@@ -182,7 +182,10 @@ function loadVideo(video) {
       activateLabel(currentGroundtruth.label);
     }
   });
-
+  $('video').on('seeked', function() {
+    nextStart = 0;
+    groundtruthLabels.forEach(function(label) { deactivateLabel(label); });
+  });
 }
 
 $(function() {
