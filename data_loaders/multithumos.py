@@ -4,6 +4,7 @@ from os import path
 
 import h5py
 
+from data_loader import DataLoader
 from thumos_util import annotation, parsing
 
 
@@ -11,7 +12,7 @@ def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
 
-class MultiThumosDataLoader(object):
+class MultiThumosDataLoader(DataLoader):
     def __init__(self, videos_dir, annotations_json, predictions_hdf5,
                  class_list):
         """
