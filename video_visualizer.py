@@ -7,7 +7,7 @@ from flask import Flask, render_template
 import data_loaders
 
 app = Flask(__name__)
-app.config.from_pyfile('video_visualizer.cfg')
+app.config.from_pyfile(os.environ['FLASK_CONFIG'])
 data_loader = data_loaders.get_data_loader(app.config['DATA_LOADER'])(
     **app.config['DATA_LOADER_CONFIG'])
 
