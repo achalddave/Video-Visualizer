@@ -5,7 +5,8 @@ from os import path
 import h5py
 
 from data_loader import DataLoader
-from thumos_util import annotation, parsing
+from thumos_util import parsing
+from thumos_util.video_tools.util import annotation
 
 
 def sigmoid(x):
