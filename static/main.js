@@ -1,8 +1,8 @@
 function predictionScoreId(label) {
-  return 'prediction-score-' + label;
+  return 'prediction-score-' + label.replace(/[ \/]/, '-');
 }
 function groundtruthLabelId(label) {
-  return 'groundtruth-label-' + label;
+  return 'groundtruth-label-' + label.replace(/[ \/]/g, '-');
 }
 
 function addLabel(label) {
