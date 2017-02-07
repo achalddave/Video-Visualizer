@@ -42,8 +42,7 @@ class MultiThumosDataLoader(DataLoader):
         Returns:
             videos (list): List of videos to serve.
         """
-        with h5py.File(self.predictions_hdf5) as predictions_f:
-            return predictions_f.keys()
+        return sorted(self.annotations.keys())
 
     def video_groundtruth(self, video_name):
         """
@@ -60,6 +59,8 @@ class MultiThumosDataLoader(DataLoader):
             predictions (dict): Maps label name to list of floats representing
                 confidences. The list spans the length of the video.
         """
+        if not self.predictions_hdf5:
+            return []
         video_name = path.splitext(video_name)[0]
         predictions = {}
         with h5py.File(self.predictions_hdf5) as predictions_f:
