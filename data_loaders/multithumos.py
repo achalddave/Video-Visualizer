@@ -30,9 +30,13 @@ class MultiThumosDataLoader(DataLoader):
                                            x.category)
                                           for x in file_annotations]
 
-        self.class_mapping = parsing.load_class_mapping(class_list).values()
+        self.class_mapping = self.load_class_mapping(class_list)
+        print(self.class_mapping)
 
         self.predictions_hdf5 = predictions_hdf5
+
+    def load_class_mapping(self, class_list):
+        return list(parsing.load_class_mapping(class_list).values())
 
     def get_videos_dir(self):
         return self.videos_dir

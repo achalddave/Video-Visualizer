@@ -1,6 +1,11 @@
 from .multithumos import MultiThumosDataLoader
+from .charades import CharadesDataLoader
 
-data_loaders = {'multithumos': MultiThumosDataLoader}
+data_loaders = {
+    'multithumos': MultiThumosDataLoader,
+    'charades': CharadesDataLoader
+}
+
 
 def get_data_loader(loader_name):
     if loader_name not in data_loaders:
