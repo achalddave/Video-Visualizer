@@ -6,20 +6,21 @@ function groundtruthLabelId(label) {
 }
 
 function addLabel(label) {
-  var groundtruthLabelDiv = $('<div/>')
+  var groundtruthLabelDiv = $('<td>')
                                 .addClass('label')
                                 .attr('id', groundtruthLabelId(label))
                                 .text(label);
-  var predictionsLabelDiv = $('<div/>')
+  var predictionsLabelDiv = $('<td>')
                                 .addClass('label')
-                                .attr('id', 'prediction-label-' + label)
+                                .attr('id', 'prediction-label-' + label);
   var predictionsScore = $('<span/>')
                              .addClass('prediction-score')
                              .attr('id', predictionScoreId(label))
                              .data('score', 0.0);
   predictionsLabelDiv.append(predictionsScore);
-  $('#groundtruth-labels').append(groundtruthLabelDiv);
-  $('#predictions-scores').append(predictionsLabelDiv);
+  $('#realtime-labels')
+      .append(
+          $('<tr>').append(groundtruthLabelDiv).append(predictionsLabelDiv));
 
   predictionsScore.on('newScore', function() {
     var $this = $(this);

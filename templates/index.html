@@ -14,17 +14,13 @@
     </select>
     <div id="video-realtime-labels">
       <video controls></video>
-      <div id="realtime-labels">
-        <div id='groundtruth'>
-          <b>Groundtruth</b>
-          <div id='groundtruth-labels'>
-          </div>
-        </div>
-        <div id='predictions'>
-          <b>Prediction</b>
-          <div id='predictions-scores'>
-          </div>
-        </div>
+      <div id='realtime-labels-container'>
+        <table id="realtime-labels">
+          <tr>
+            <td id='groundtruth'> <b>Groundtruth</b> </td>
+            <td id='predictions'> <b>Predictions</b> </td>
+          </tr>
+        </table>
       </div>
     </div>
     <h2 id="debug"></h1>
