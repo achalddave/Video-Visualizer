@@ -1,5 +1,5 @@
 function predictionScoreId(label) {
-  return 'prediction-score-' + label.replace(/[ \/]/, '-');
+  return 'prediction-score-' + label.replace(/[ \/]/g, '-');
 }
 function groundtruthLabelId(label) {
   return 'groundtruth-label-' + label.replace(/[ \/]/g, '-');
