@@ -265,6 +265,9 @@ function loadVideo(video) {
 }
 
 $(function() {
+  $('#video-selector').change(function() {
+    loadVideo($(this).val());
+  });
   // Populate video options:
   $.get('/video_list', function(videoList) {
     var options = [];
@@ -273,9 +276,6 @@ $(function() {
           '<option value="' + videoName + '">' + videoName + '</option>');
     });
     $('#video-selector').html(options.join(''));
-    $('#video-selector').val('video_validation_0000153').change();
-  });
-  $('#video-selector').change(function() {
-    loadVideo($(this).val());
+    $('#video-selector').val(videoList[0]).change();
   });
 });
