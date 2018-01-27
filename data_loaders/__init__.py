@@ -1,4 +1,4 @@
-from multithumos import MultiThumosDataLoader
+from .multithumos import MultiThumosDataLoader
 
 data_loaders = {'multithumos': MultiThumosDataLoader}
 

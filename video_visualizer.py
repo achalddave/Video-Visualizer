@@ -4,7 +4,7 @@ from os import path
 import flask
 from flask import Flask, render_template
 
-import data_loaders
+from . import data_loaders
 
 app = Flask(__name__)
 app.config.from_pyfile(os.environ['FLASK_CONFIG'])
@@ -23,7 +23,7 @@ def video_list():
 def video(video_name):
     if not video_name.endswith(app.config['VIDEO_EXTENSION']):
         video_name = video_name + '.' + app.config['VIDEO_EXTENSION']
-    print video_name
+    print(video_name)
     return flask.send_from_directory(data_loader.get_videos_dir(), video_name)
 
 

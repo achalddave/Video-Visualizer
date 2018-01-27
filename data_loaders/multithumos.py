@@ -4,9 +4,9 @@ from os import path
 
 import h5py
 
-from data_loader import DataLoader
-from thumos_util import parsing
-from thumos_util.video_tools.util import annotation
+from .data_loader import DataLoader
+from .thumos_util import parsing
+from .thumos_util.video_tools.util import annotation
 
 
 def sigmoid(x):
@@ -64,7 +64,7 @@ class MultiThumosDataLoader(DataLoader):
         video_name = path.splitext(video_name)[0]
         predictions = {}
         with h5py.File(self.predictions_hdf5) as predictions_f:
-            predictions_matrix = predictions_f[video_name]
+            predictions_matrix = predictions_f[video_name].value
             predictions = {
                 self.class_mapping[i]: [float(sigmoid(x))
                                         for x in predictions_matrix[:, i]]
