@@ -17,25 +17,40 @@ body { }
 #video-realtime-labels {
   margin: 0 auto;
   text-align: center;
+  width: 100%;
 }
 
 video {
-  vertical-align: middle;
-  width: 500px;
+  margin-top: 20px;
+  max-width: 400px;
+  width: 20%;
 }
 
 #realtime-labels-container {
   display: inline-block;
   overflow: auto;
   resize: horizontal;
-  width: 300px;
-  vertical-align: middle;
+  width: 80%;
+  height: 1000px;
+  vertical-align: top;
 }
 
 #realtime-labels {
   display: inline-block;
-  vertical-align: middle;
   width: 100%;
+}
+
+#labels-in-video-title, #labels-not-in-video-title {
+  background: #6B0000;
+  color: #eee;
+}
+
+.groundtruth-label {
+  width: 20%;
+}
+
+.prediction-label {
+  width: 10%;
 }
 
 .label {
@@ -46,4 +61,12 @@ video {
 .active-label {
   color: white;
   background: black;
+}
+
+.prediction-score-graph {
+  width: 65%;
+}
+
+.prediction-score-graph > div {
+  width: 100%;
 }

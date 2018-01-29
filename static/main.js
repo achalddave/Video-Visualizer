@@ -2,29 +2,51 @@ function addBreakCharacters(label) {
   // Add control characters allowing the label to be broken into multiple lines.
   return label.replace(/[\/]/g, '/\u200B');
 }
+function escapeLabel(label) {
+  return label.replace(/[ \/]/g, '-');
+}
 function predictionScoreId(label) {
-  return 'prediction-score-' + label.replace(/[ \/]/g, '-');
+  return 'prediction-score-' + escapeLabel(label);
+}
+function predictionGraphId(label) {
+  return 'prediction-graph-' + escapeLabel(label);
 }
 function groundtruthLabelId(label) {
-  return 'groundtruth-label-' + label.replace(/[ \/]/g, '-');
+  return 'groundtruth-label-' + escapeLabel(label);
 }
 
-function addLabel(label) {
+function addLabel(label, labelInVideo) {
+  /* Add label row to groundtruth / predictions table in UI.
+   *
+   * @param {string} label Name of label.
+   * @param {bool} labelInVideo Indicates whether the label is in the
+   *     groundtruth for current video.
+   *
+   */
   var groundtruthLabelDiv = $('<td>')
-                                .addClass('label')
+                                .addClass('label groundtruth-label')
                                 .attr('id', groundtruthLabelId(label))
                                 .html(addBreakCharacters(label));
   var predictionsLabelDiv = $('<td>')
-                                .addClass('label')
+                                .addClass('label prediction-label')
                                 .attr('id', 'prediction-label-' + label);
   var predictionsScore = $('<span/>')
                              .addClass('prediction-score')
                              .attr('id', predictionScoreId(label))
                              .data('score', 0.0);
   predictionsLabelDiv.append(predictionsScore);
-  $('#realtime-labels')
-      .append(
-          $('<tr>').append(groundtruthLabelDiv).append(predictionsLabelDiv));
+  var predictionsGraph =
+      $('<td/>')
+          .append($('<div/>').attr('id', predictionGraphId(label)))
+          .addClass('prediction-score-graph');
+  var toAddContainer =
+      labelInVideo ? $('#labels-in-video') : $('#labels-not-in-video');
+  toAddContainer.append(
+      $('<tr>')
+          .addClass('label-row')
+          .append(groundtruthLabelDiv)
+          .append(predictionsLabelDiv)
+          .append(predictionsGraph));
 
   predictionsScore.on('newScore', function() {
     var $this = $(this);
@@ -51,15 +73,98 @@ function deactivateLabel(label) {
   $('#' + groundtruthLabelId(label)).removeClass('active-label');
 }
 
-function updateScores(scores) {
+function updateScores(allPredictions, frame) {
   /* Update prediction score for each label at the current time.
    *
-   * @param {object} scores Map label name to current score.
+   * @param {object} allPredictions Map label name to list of scores for each
+   *     frame.
+   * @param {number} frame Current frame index.
    */
-  for (var label in scores) {
-    $('#' + predictionScoreId(label))
-        .data('score', scores[label])
+  for (var label in allPredictions) {
+    // There may be labels we aren't displaying, for which the following will
+    // just be a no-op. We could optimize this by only running on labels that
+    // are displayed, but it seems to be fast enough.
+    predictionScoreDiv = $('#' + predictionScoreId(label));
+
+    if (predictionScoreDiv.length == 0) { continue; }
+    predictionScoreDiv.data('score', allPredictions[label][frame])
         .trigger('newScore');
+
+    var layout = {
+      shapes: [
+        {
+          type: 'line',
+          x0: frame,
+          y0: 0,
+          x1: frame,
+          y1: 1,
+          line: {
+            color: 'rgb(0, 0, 0)',
+            width: 3
+          }
+        },
+      ]
+    };
+    Plotly.update(predictionGraphId(label), {}, layout);
+  }
+
+
+}
+
+function drawGraphs(allPredictions, allGroundtruthBinary, framesPerSecond) {
+  var numFrames = allPredictions[Object.keys(allPredictions)[0]].length;
+  var frameRange = _.range(numFrames);
+  var zeroGroundtruth = Array(numFrames).fill(0);
+  // Ensure all graphs are the same width.
+  var graphWidth = null;
+  for (var label in allPredictions) {
+    var labelGraphDiv = $('#' + predictionGraphId(label));
+    if (labelGraphDiv.length == 0) { continue; }
+    if (graphWidth == null) {
+      graphWidth = labelGraphDiv.width();
+    }
+    var groundtruthData = label in allGroundtruthBinary ?
+        allGroundtruthBinary[label] :
+        zeroGroundtruth;
+    var data = [
+      {x: frameRange, y: allPredictions[label], name: 'Predictions'},
+      {x: frameRange, y: groundtruthData, name: 'Groundtruth'}
+    ];
+    var predictionsLayout = {
+      annotations: [],
+      height: 50,
+      width: graphWidth,
+      margin: {
+        r: 0,
+        t: 0,
+        b: 0,
+        l: 0
+      },
+      xaxis: {
+        range: [0, numFrames],
+        showgrid: false,
+        zeroline: false,
+        showline: false,
+        autotick: true,
+        ticks: '',
+        showticklabels: false
+      },
+      yaxis: {
+        range: [0, 1.1],
+        showgrid: true,
+        zeroline: true,
+        showline: false,
+        autotick: true,
+        ticks: '',
+        showticklabels: false
+      },
+      showlegend: false
+    };
+    Plotly.newPlot(
+      predictionGraphId(label), data, predictionsLayout, {displayModeBar: false});
+    labelGraphDiv[0].on('plotly_click', function(data) {
+      $('video')[0].currentTime = data.points[0].x / framesPerSecond;
+    });
   }
 }
 
@@ -90,11 +195,11 @@ function processGroundtruth(receivedGroundtruth) {
 }
 
 // TODO(achald): Implement this.
-function groundtruthToBinaryArrays(groundtruth, videoLength, numFrames) {
+function groundtruthToBinaryArrays(groundtruth, framesPerSecond, numFrames) {
   /*
    * @param {Array} groundtruth Array of objects containing fields .start, .end,
    *     .label, sorted by start time and then by end time.
-   * @param {float} videoLength Length of video in seconds.
+   * @param {number} framesPerSecond
    * @param {int} numFrames Number of frames to output binary array for.
    *
    * @returns {object} Maps label to a binary array of length numFrames.
@@ -107,8 +212,6 @@ function groundtruthToBinaryArrays(groundtruth, videoLength, numFrames) {
       groundtruthByLabel[x.label] = [x];
     }
   });
-
-  var framesPerSecond = numFrames / videoLength;
 
   var labelArrays = {};
   for (var label in groundtruthByLabel) {
@@ -155,9 +258,9 @@ function loadVideo(video) {
   var videoLength = null;  // Video length in seconds
   var groundtruthLabels = null;
   var numFrames = null;
+  var framesPerSecond = null;
 
-  $('#predictions-scores').html('');
-  $('#groundtruth-labels').html('');
+  $('.label-row').remove();
   $('#predictions-graph').html('');
   $('#groundtruth-graph').html('');
 
@@ -178,10 +281,14 @@ function loadVideo(video) {
       allGroundtruth = processGroundtruth(groundtruthResponse[0]);
       allPredictions = predictionsResponse[0];
       numFrames = allPredictions[Object.keys(allPredictions)[0]].length;
+      framesPerSecond = numFrames / videoLength;
 
-      groundtruthLabels = getUniqueLabels(allGroundtruth);
+      var groundtruthLabelsSet = {};
+      allGroundtruth.forEach(function(x) {
+        groundtruthLabelsSet[x.label] = true;
+      });
+      groundtruthLabels = Object.keys(groundtruthLabelsSet);
       groundtruthLabels.sort();
-      groundtruthLabels.forEach(function(label) { addLabel(label); });
 
       var labelsArray = [];
       for (var label in allPredictions) { labelsArray.push(label); }
@@ -189,6 +296,23 @@ function loadVideo(video) {
       var heatmapValues = [];
       labelsArray.forEach(function(label) {
         heatmapValues.push(allPredictions[label]);
+      });
+
+      // Add labels sorted in descending order by mean prediction.
+      var meanPredictions = {};
+      for (var label in allPredictions) {
+        var total = 0;
+        allPredictions[label].forEach(function(score) { total += score; });
+        meanPredictions[label] = total / allPredictions[label].length;
+      }
+      var sortedLabelsArray = labelsArray.slice();
+      sortedLabelsArray.sort(function(a, b) {
+        // Sort in descending order of mean prediction.
+        return meanPredictions[a] > meanPredictions[b] ? -1 : 1;
+      });
+      sortedLabelsArray.forEach(function(label) {
+        labelInVideo = groundtruthLabelsSet[label] == true;
+        addLabel(label, labelInVideo);
       });
       var labelsText = [];
       for (var i = 0; i < heatmapValues.length; ++i) {
@@ -205,8 +329,9 @@ function loadVideo(video) {
       }];
       var predictionsLayout = {title: 'Predictions', annotations: []};
       Plotly.newPlot('predictions-graph', predictionsData, predictionsLayout);
-      var groundtruthBinaryArrays =
-          groundtruthToBinaryArrays(allGroundtruth, videoLength, numFrames);
+      var groundtruthBinaryArrays = groundtruthToBinaryArrays(
+          allGroundtruth, framesPerSecond, numFrames);
+      drawGraphs(allPredictions, groundtruthBinaryArrays, framesPerSecond);
       var groundtruthHeatmap = [];
       var zeroArray = new Array(numFrames);
       for (var i = 0; i < numFrames; ++i) { zeroArray[i] = 0; }
@@ -236,11 +361,7 @@ function loadVideo(video) {
 
         // Update prediction scores for current frame.
         var frame = Math.round(time * numFrames / videoLength);
-        var scores = {};
-        groundtruthLabels.forEach(function(label) {
-          scores[label] = allPredictions[label][frame];
-        });
-        updateScores(scores);
+        updateScores(allPredictions, frame);
 
         // Find which groundtruths are active.
         for (var i = nextStart; i < allGroundtruth.length; ++i) {

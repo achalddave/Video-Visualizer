@@ -6,6 +6,7 @@
     <title></title>
     <script src="/static/plotly-latest.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
     <script src="/static/main.js"></script>
     <link rel="stylesheet" href="/static/main.css" type="text/css">
   </head>
@@ -16,15 +17,30 @@
       <select id='video-selector'>
       </select>
     </div>
-    </div>
-    <div id="video-realtime-labels">
-      <video controls></video>
-      <div id='realtime-labels-container'>
+    </div><!--
+    --><div id="video-realtime-labels">
+      <video controls></video><!--
+      --><div id='realtime-labels-container'>
         <table id="realtime-labels">
           <tr>
-            <td id='groundtruth'> <b>Groundtruth</b> </td>
-            <td id='predictions'> <b>Predictions</b> </td>
+            <td colspan="3" id="labels-in-video-title">Labels in video</td>
           </tr>
+          <tr>
+            <td id="groundtruth"><b>Groundtruth</b></td>
+            <td id="predictions"><b>Predictions</b></td>
+          </tr>
+          <tbody id="labels-in-video">
+          </tbody>
+          <tr>
+            <td colspan="3" id="labels-not-in-video-title">
+              Other labels (sorted by mean prediction)</td>
+          </tr>
+          <tr>
+            <td id="groundtruth"><b>Groundtruth</b></td>
+            <td id="predictions"><b>Predictions</b></td>
+          </tr>
+          <tbody id="labels-not-in-video">
+          </tbody>
         </table>
       </div>
     </div>
