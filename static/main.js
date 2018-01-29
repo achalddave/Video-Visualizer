@@ -1,3 +1,7 @@
+function addBreakCharacters(label) {
+  // Add control characters allowing the label to be broken into multiple lines.
+  return label.replace(/[\/]/g, '/\u200B');
+}
 function predictionScoreId(label) {
   return 'prediction-score-' + label.replace(/[ \/]/g, '-');
 }
@@ -9,7 +13,7 @@ function addLabel(label) {
   var groundtruthLabelDiv = $('<td>')
                                 .addClass('label')
                                 .attr('id', groundtruthLabelId(label))
-                                .text(label);
+                                .html(addBreakCharacters(label));
   var predictionsLabelDiv = $('<td>')
                                 .addClass('label')
                                 .attr('id', 'prediction-label-' + label);
