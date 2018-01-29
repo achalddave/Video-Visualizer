@@ -83,7 +83,7 @@ function processGroundtruth(receivedGroundtruth) {
     if (startDiff != 0) {
       return startDiff;
     } else {
-      return a.end - b.end
+      return a.end - b.end;
     }
   });
   return groundtruth;
@@ -99,7 +99,7 @@ function groundtruthToBinaryArrays(groundtruth, videoLength, numFrames) {
    *
    * @returns {object} Maps label to a binary array of length numFrames.
    */
-  var groundtruthByLabel = {}
+  var groundtruthByLabel = {};
   groundtruth.forEach(function(x) {
     if (x.label in groundtruthByLabel) {
       groundtruthByLabel[x.label].push(x);
@@ -183,14 +183,14 @@ function loadVideo(video) {
       groundtruthLabels.sort();
       groundtruthLabels.forEach(function(label) { addLabel(label); });
 
-      var labelsArray = []
+      var labelsArray = [];
       for (var label in allPredictions) { labelsArray.push(label); }
 
       var heatmapValues = [];
       labelsArray.forEach(function(label) {
         heatmapValues.push(allPredictions[label]);
       });
-      var labelsText = []
+      var labelsText = [];
       for (var i = 0; i < heatmapValues.length; ++i) {
         labelsText.push([]);
         for (var j = 0; j < heatmapValues[i].length; ++j) {
@@ -207,7 +207,7 @@ function loadVideo(video) {
       Plotly.newPlot('predictions-graph', predictionsData, predictionsLayout);
       var groundtruthBinaryArrays =
           groundtruthToBinaryArrays(allGroundtruth, videoLength, numFrames);
-      var groundtruthHeatmap = []
+      var groundtruthHeatmap = [];
       var zeroArray = new Array(numFrames);
       for (var i = 0; i < numFrames; ++i) { zeroArray[i] = 0; }
       labelsArray.forEach(function(label) {
@@ -236,10 +236,10 @@ function loadVideo(video) {
 
         // Update prediction scores for current frame.
         var frame = Math.round(time * numFrames / videoLength);
-        var scores = {}
+        var scores = {};
         groundtruthLabels.forEach(function(label) {
           scores[label] = allPredictions[label][frame];
-        })
+        });
         updateScores(scores);
 
         // Find which groundtruths are active.
