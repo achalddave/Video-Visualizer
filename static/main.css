@@ -1,5 +1,19 @@
 body { }
 
+#config-container {
+  text-align: center;
+}
+#video-selector-container {
+  font-size: 20px;
+  border-bottom: solid 3px #6B0000;
+  padding: 10px;
+  margin: 1em 0;
+  display: inline-block;
+}
+#video-selector {
+  font-size: 20px;
+}
+
 #video-realtime-labels {
   margin: 0 auto;
   text-align: center;
