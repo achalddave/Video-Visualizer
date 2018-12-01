@@ -4,6 +4,14 @@ class DataLoader(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
+    def get_video(self, video_name):
+        """
+        Returns:
+            video_path (Path): Path to video file.
+        """
+        pass
+
+    @abstractmethod
     def video_list(self):
         """
         Returns:

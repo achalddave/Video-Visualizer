@@ -1,6 +1,7 @@
 import collections
 import math
 from os import path
+from pathlib import Path
 
 import h5py
 
@@ -15,14 +16,14 @@ def sigmoid(x):
 
 class MultiThumosDataLoader(DataLoader):
     def __init__(self, videos_dir, annotations_json, predictions_hdf5,
-                 class_list):
+                 class_list, extension):
         """
         videos_dir (str): Path to directory of videos.
         annotations_json (str): Path to file with JSON annotations.
         predictions_hdf5 (str): Path to HDF5 containing annotations.
         class_list (str): Path to text file containing a list of classes.
         """
-        self.videos_dir = videos_dir
+        self.videos_dir = Path(videos_dir)
         annotations = annotation.load_annotations_json(annotations_json)
         self.annotations = {}
         for filename, file_annotations in annotations.items():
@@ -31,15 +32,15 @@ class MultiThumosDataLoader(DataLoader):
                                           for x in file_annotations]
 
         self.class_mapping = self.load_class_mapping(class_list)
-        print(self.class_mapping)
+        self.extension = extension
 
         self.predictions_hdf5 = predictions_hdf5
 
     def load_class_mapping(self, class_list):
         return list(parsing.load_class_mapping(class_list).values())
 
-    def get_videos_dir(self):
-        return self.videos_dir
+    def get_video(self, name):
+        return self.videos_dir / (name + self.extension)
 
     def video_list(self):
         """

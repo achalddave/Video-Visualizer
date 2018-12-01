@@ -23,9 +23,8 @@ def video_list():
 
 @app.route('/video/<path:video_name>')
 def video(video_name):
-    if not video_name.endswith(app.config['VIDEO_EXTENSION']):
-        video_name = video_name + '.' + app.config['VIDEO_EXTENSION']
-    return flask.send_from_directory(data_loader.get_videos_dir(), video_name)
+    video_path = data_loader.get_video(video_name)
+    return flask.send_from_directory(video_path.parent, video_path.name)
 
 
 @app.route('/groundtruth/<video_name>')
