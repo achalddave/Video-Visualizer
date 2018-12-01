@@ -90,22 +90,15 @@ function updateScores(allPredictions, frame) {
     predictionScoreDiv.data('score', allPredictions[label][frame])
         .trigger('newScore');
 
-    var layout = {
-      shapes: [
-        {
-          type: 'line',
-          x0: frame,
-          y0: 0,
-          x1: frame,
-          y1: 1,
-          line: {
-            color: 'rgb(0, 0, 0)',
-            width: 3
-          }
-        },
-      ]
-    };
-    Plotly.update(predictionGraphId(label), {}, layout);
+    Plotly.relayout(predictionGraphId(label), {
+      shapes: [{
+        type: 'line',
+        x0: frame,
+        y0: 0,
+        x1: frame,
+        y1: 1,
+      }]
+    });
   }
 
 
@@ -134,12 +127,7 @@ function drawGraphs(allPredictions, allGroundtruthBinary, framesPerSecond) {
       annotations: [],
       height: 50,
       width: graphWidth,
-      margin: {
-        r: 0,
-        t: 0,
-        b: 0,
-        l: 0
-      },
+      margin: {r: 0, t: 0, b: 0, l: 0},
       xaxis: {
         range: [0, numFrames],
         showgrid: false,
