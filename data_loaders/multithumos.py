@@ -16,7 +16,7 @@ def sigmoid(x):
 
 class MultiThumosDataLoader(DataLoader):
     def __init__(self, videos_dir, annotations_json, predictions_hdf5,
-                 class_list, extension):
+                 class_list, video_extension):
         """
         videos_dir (str): Path to directory of videos.
         annotations_json (str): Path to file with JSON annotations.
@@ -32,7 +32,7 @@ class MultiThumosDataLoader(DataLoader):
                                           for x in file_annotations]
 
         self.class_mapping = self.load_class_mapping(class_list)
-        self.extension = extension
+        self.video_extension = video_extension
 
         self.predictions_hdf5 = predictions_hdf5
 
@@ -40,7 +40,7 @@ class MultiThumosDataLoader(DataLoader):
         return list(parsing.load_class_mapping(class_list).values())
 
     def get_video(self, name):
-        return self.videos_dir / (name + self.extension)
+        return self.videos_dir / (name + self.video_extension)
 
     def video_list(self):
         """
