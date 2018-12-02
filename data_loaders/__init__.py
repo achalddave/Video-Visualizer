@@ -8,9 +8,15 @@ def load_charades():
     return CharadesDataLoader
 
 
+def load_imagenet_vid():
+    from .imagenet_vid import ImagenetVidDataLoader
+    return ImagenetVidDataLoader
+
+
 data_loaders = {
     'multithumos': load_multithumos,
     'charades': load_charades,
+    'imagenet-vid': load_imagenet_vid
 }
 
 
