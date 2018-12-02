@@ -3,7 +3,9 @@
 A relatively bare-bones interface for visualizing per-frame predictions and
 groundtruth labels on video data.
 
-![](screenshots/demo.gif)
+*Click to play*
+
+[![](screenshots/screencap.png)](screenshots/video-visualizer-example.mp4)
 
 ## Usage
 
