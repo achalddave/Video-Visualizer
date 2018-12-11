@@ -24,19 +24,21 @@ class ImagenetVidDataLoader(DataLoader):
                 (wordnet_id, description) tuple.
         """
         if isinstance(videos_dir, str):
-            videos_dir = Path(videos_dir)
+            self.videos_dir = Path(videos_dir)
         if isinstance(predictions_hdf5_dir, str):
             predictions_hdf5_dir = Path(predictions_hdf5_dir)
 
-        self.video_paths = {
-            x.stem: x for x in videos_dir.iterdir() if is_video_path(x)
-        }
         self.predictions_hdf5_dir = predictions_hdf5_dir
         with open(index_label_mapping, 'r') as f:
             self.index_label_mapping = {
                 int(index): (wordnet_id, description)
                 for index, (wordnet_id, description) in json.load(f).items()
             }
+
+    def load_video_paths(self):
+        self.video_paths = {
+            x.stem: x for x in self.videos_dir.iterdir() if is_video_path(x)
+        }
 
     def get_video(self, video_name):
         return self.video_paths[video_name]
@@ -46,6 +48,7 @@ class ImagenetVidDataLoader(DataLoader):
         Returns:
             videos (list): List containing video names as strings.
         """
+        self.load_video_paths()
         return list(self.video_paths.keys())
 
     def video_groundtruth(self, video_name):
