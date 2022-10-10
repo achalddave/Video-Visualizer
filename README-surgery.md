@@ -29,4 +29,9 @@ ffmpeg -i Vial_Solomon_Clip_44_old.mp4 -vcodec libx264 -acodec aac Vial_Solomon_
 
 ## Run the visualization tool
 
+```
 FLASK_APP=video_visualizer.py FLASK_CONFIG=surgery_vis.cfg flask run
+```
+
+Open your browser and go to http://127.0.0.1:5000/
+
