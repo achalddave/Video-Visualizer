@@ -13,10 +13,16 @@ def load_imagenet_vid():
     return ImagenetVidDataLoader
 
 
+def load_surgery():
+    from .surgery import SurgeryDataLoader
+    return SurgeryDataLoader
+
+
 data_loaders = {
     'multithumos': load_multithumos,
     'charades': load_charades,
-    'imagenet-vid': load_imagenet_vid
+    'imagenet-vid': load_imagenet_vid,
+    'surgery': load_surgery,
 }
 
 
