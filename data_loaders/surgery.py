@@ -15,7 +15,11 @@ class SurgeryDataLoader(DataLoader):
         videos = list(self.data_dir.rglob("*.mp4"))
         self.videos = {}
         for v in videos:
-            self.videos[v.name] = {"path": v, "label_path": v.with_suffix(".csv"), "label": v.parent.name}
+            self.videos[v.name] = {
+                "path": v,
+                "label_path": v.with_suffix(".csv"),
+                "label": v.parent.name,
+            }
 
     def get_video(self, video_name):
         """
@@ -52,7 +56,26 @@ class SurgeryDataLoader(DataLoader):
             predictions (dict): Maps label name to list of floats representing
                 confidences. The list spans the length of the video.
         """
-        # Map frame index to label name
+        labels_list = [
+            "Amiodarone",
+            "Dexamethasone",
+            "Etomidate",
+            "Fentanyl",
+            "Glycopyrrolate",
+            "Hydromorphone",
+            "Ketamine",
+            "Ketorolac",
+            "Lidocaine",
+            "Magnesium Sulfate",
+            "Midazolam",
+            "Nesostigmine",
+            "Ondansetron",
+            "Propofol",
+            "Rocuronium",
+            "Vasopressin",
+            "Vecuronium",
+        ]
+        # Map frame index to label scores
         frame_labels = {}
         with open(self.videos[video_name]["label_path"], "r") as f:
             reader = csv.reader(f)
@@ -62,10 +85,10 @@ class SurgeryDataLoader(DataLoader):
                     frame = 0
                 else:
                     frame = int(frame_raw) - 1
-                frame_labels[frame] = row[1]
-        label_set = set(frame_labels.values())
+                frame_labels[frame] = [float(x) for x in row[2:]]
         # Map label name to confidence for each frame.
-        labels = {k: [0] * len(frame_labels) for k in label_set}
-        for frame, label in frame_labels.items():
-            labels[label][frame] = 1.0
+        labels = {k: [0] * len(frame_labels) for k in labels_list}
+        for frame, scores in frame_labels.items():
+            for i, label in enumerate(labels_list):
+                labels[label][frame] = scores[i]
         return labels
